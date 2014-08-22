@@ -20,8 +20,8 @@ for swatch in soup.find_all('div', {'class': 'swatch_content'}):
 
     inspiration = swatch.find('div', {'class': 'swatch_info_right'}).find('span').get_text()
 
-    right_bg = get_hex_color(swatch['style'])
-    left_bg  = get_hex_color(swatch.find('div', {'class': 'swatch_content_left'})['style'])
+    bg_right = get_hex_color(swatch['style'])
+    bg_left  = get_hex_color(swatch.find('div', {'class': 'swatch_content_left'})['style'])
 
     colors = [get_hex_color(color['style']) for color in
               swatch.find_all('div', {'class': 'swatch'})]
@@ -29,8 +29,8 @@ for swatch in soup.find_all('div', {'class': 'swatch_content'}):
     swatch = {
         'date': {'year': year, 'month': month, 'day': day},
         'inspiration': inspiration,
-        'right_bg': right_bg,
-        'left_bg': left_bg,
+        'bg_right': bg_right,
+        'bg_left': bg_left,
         'colors': colors
     }
 

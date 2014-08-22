@@ -2,8 +2,14 @@ Flask==0.10.1
 Jinja2==2.7.3
 MarkupSafe==0.23
 Werkzeug==0.9.6
+arrow==0.4.4
+beautifulsoup4==4.3.2
 gevent==1.0.1
 greenlet==0.4.3
 gunicorn==19.1.1
 itsdangerous==0.24
+lxml==3.3.5
+python-dateutil==2.2
 redis==2.10.3
+requests==2.3.0
+six==1.7.3

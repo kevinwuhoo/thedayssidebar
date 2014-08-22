@@ -1,0 +1,6 @@
+.DS_Store
+.Python
+.env
+bin
+lib
+include
