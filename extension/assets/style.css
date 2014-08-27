@@ -1,0 +1,60 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body, a {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  text-decoration: none;
+}
+.info-right > a {
+  color: inherit
+}
+.bold {
+  font-weight: 400;
+ }
+.bg {
+  height: 100%;
+  width: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  display: none;
+}
+.center {
+  margin: auto;
+  text-align: center;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  height: 80px;
+  width: 100%;
+  display: none;
+}
+.palette, .color {
+  z-index: 100;
+}
+.color {
+  height: 80px;
+  width: 80px;
+  border-radius: 80px;
+  display: inline-block;
+  margin: 20px;
+}
+.info {
+  padding-top: 450px;
+  width: 560px;
+}
+.info-left, .info-right {
+  display: inline-block;
+}
+.info-left {
+  float: left;
+  word-spacing: 1em;
+}
+.info-right {
+  float: right;
+  text-align: right;
+}
