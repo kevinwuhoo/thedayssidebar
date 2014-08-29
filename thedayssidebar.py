@@ -36,7 +36,7 @@ def scrape_sidebar():
         title = item.find('title').get_text()
 
         link = item.find('link').get_text()
-        link = requests.get(link).url
+        link = requests.get(link, verify=False).url
 
         date = item.find('pubDate').get_text().split()[1:4]
         date = " ".join(date)
@@ -67,7 +67,7 @@ def before_request():
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'scrape':
-        print requests.get('http://thedayscolor.herokuapp.com/sidebar/scrape').json()
+    if len(sys.argv) == 2 and sys.argv[1] == 'scrape':
+        print requests.get('http://thedayssidebar.herokuapp.com/sidebar/scrape').json()
     else:
         app.run(debug=True)
