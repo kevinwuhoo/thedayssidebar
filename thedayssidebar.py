@@ -5,7 +5,6 @@ import json
 from flask import Flask, jsonify, g
 from bs4 import BeautifulSoup
 import requests
-import collections
 import arrow
 import sys
 
@@ -30,33 +29,33 @@ def scrape_sidebar():
     r = requests.get('http://feeds.sidebar.io/SidebarFeed?format=xml')
     soup = BeautifulSoup(r.content, "xml")
 
-    # sometimes there aren't 5 items, group by date first
-    items_by_date = collections.defaultdict(list)
+    # go through xml feed and get title, link, and parse date with arrow
+    items = []
     for item in soup.find_all('item'):
         title = item.find('title').get_text()
 
+        # this link has an extra sidebar redirect
+        # defer following redirect so that only 5 reqs have to be made
         link = item.find('link').get_text()
-        link = requests.get(link, verify=False).url
 
-        date = item.find('pubDate').get_text().split()[1:4]
+        date = item.find('pubDate').get_text().split()[1:5]
         date = " ".join(date)
-        date = arrow.get(date, 'DD MMM YYYY')
-        date = "%s-%s-%s" % (date.year, date.month, date.day)
+        date = arrow.get(date, 'DD MMM YYYY HH:mm:ss')
+        items.append({'title': title, 'link': link, 'date': date})
 
-        items_by_date[date].append({
-            'title': title,
-            'link': link,
+    # ensure sorted by chonological, remove date, follow redirect
+    items = sorted(items, key=lambda x: x['date'], reverse=True)
+    recent_5_items = []
+    for item in items[:5]:
+        link = requests.get(item['link'], verify=False).url
+        recent_5_items.append({
+            'title': item['title'],
+            'link': link
         })
 
-    sorted_dates = sorted(items_by_date.keys(), reverse=True)
-
-    # find the first one with 5 links
-    for i in range(len(items_by_date)):
-        items = items_by_date[sorted_dates[i]]
-        if len(items) == 5:
-            g.db.delete('sidebar')
-            g.db.set('sidebar', json.dumps(items))
-            return jsonify({sorted_dates[i]: items})
+    g.db.delete('sidebar')
+    g.db.set('sidebar', json.dumps(recent_5_items))
+    return jsonify({"items": recent_5_items})
 
 
 @app.before_request
