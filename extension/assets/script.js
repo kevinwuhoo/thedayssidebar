@@ -1,4 +1,20 @@
 $(document).ready(function() {
+
+  // gets background image and sets it in the correct preview
+  for (var i = 0; i < 5; i++) {
+    (function(i) {
+      var sidebarUrl = 'http://thedayssidebar.herokuapp.com/sidebar/image/' + i
+      $.get(sidebarUrl, {}, function(img){
+        // image stored in redis is base64 encoded but chrome crashes with
+        // very long urls, create a blob with url instead
+        // https://code.google.com/p/chromium/issues/detail?id=69227
+        var blob = b64toBlob(img, 'image/png');
+        var imgUrl = URL.createObjectURL(blob);
+        $('.preview').eq(i).find('.bg-img').attr('src', imgUrl);
+      });
+    })(i);
+  }
+
   $.getJSON('http://thedayssidebar.herokuapp.com', null, function(data) {
 
     var palette = data.palette;
@@ -10,11 +26,10 @@ $(document).ready(function() {
 
     // setting of palette colors and sidebar titles/links, activate tooltips
     for(var i = 0; i < 5; i++) {
-      $($('.color').get(i)).css('background-color', palette['colors'][i]);
-      $($('.color').get(i)).attr('title', sidebar[i]['title']);
-      $($('.palette a').get(i)).attr('href', sidebar[i]['link']);
+      $('.color').eq(i).css('background-color', palette['colors'][i]);
+      $('.preview').eq(i).find('.bg-text').text(sidebar[i]['title']);
+      $('.palette a').eq(i).attr('href', sidebar[i]['link']);
     }
-    $('.color').tooltip();
 
     // determine if text color should be dark or light depending on background
     $('.info-left').css('color', determineTextColor(palette.bg_left));
@@ -22,10 +37,19 @@ $(document).ready(function() {
 
     // add current to the left panel
     date = new Date();
-    $('.info-left').text(
+    $('.the-date').text(
       [padNumber(date.getDate()), padNumber(date.getMonth() + 1),
-       date.getFullYear()].join(' ')
+       date.getFullYear()].join(' / ')
     );
+    window.setInterval(function updateTime() {
+      date = new Date();
+      $('.the-time').text(
+        [padNumber(date.getHours()), padNumber(date.getMinutes()),
+         padNumber(date.getSeconds())].join(' : ')
+      );
+      return updateTime;
+    }(), 1000);
+
     // add source of inspiration to the right panel
     $('.inspiration').text(palette.inspiration);
 
@@ -40,8 +64,39 @@ $(document).ready(function() {
     window.setTimeout(function() {
       $('.info').fadeIn('fast');
     }, 750);
+
+    $('.color').hover(
+      function() {
+        var colorIndex = $(this).attr('data-color-index');
+        $('.preview[data-color-index=' + colorIndex + ']').fadeIn('fast');
+      }, function() {
+        $('.preview').fadeOut('fast');
+      }
+    );
   });
 });
+
+// http://stackoverflow.com/a/16245768
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    var slice = byteCharacters.slice(offset, offset + sliceSize);
+    var byteNumbers = new Array(slice.length);
+    for (var i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    var byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  var blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
 
 // http://stackoverflow.com/a/3943023
 function determineTextColor(hex) {

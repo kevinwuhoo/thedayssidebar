@@ -11,7 +11,7 @@ html, body, a {
   font-size: 11px;
   text-decoration: none;
 }
-.info-right > a {
+a {
   color: inherit
 }
 .bold {
@@ -24,11 +24,37 @@ html, body, a {
   box-sizing: border-box;
   display: none;
 }
+.bg-top50 {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  text-align: center;
+}
+.bg-text {
+  display: flex;
+  justify-content:center;
+  align-content:center;
+  flex-direction:column;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(0, 0, 0, 0.8);
+  font-family: 'Roboto', sans-serif;;
+  font-weight: 700;
+  font-size: 48px;
+  z-index: 90;
+}
+.bg-img {
+  opacity: 1.0;
+}
 .center {
   margin: auto;
   text-align: center;
   position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
+  top: -40px;
+  left: 0;
+  bottom: 0;
+  right: 0;
   height: 80px;
   width: 100%;
   display: none;
@@ -52,7 +78,10 @@ html, body, a {
 }
 .info-left {
   float: left;
-  word-spacing: 1em;
+  word-spacing: 0.5em;
+}
+.the-date, .the-time {
+  text-align: left;
 }
 .info-right {
   float: right;
