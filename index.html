@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="0Qva8_q5lSfP9uhcTafflplg2Akc9trqNQH3zY2Xvog">
+    <title>The Day's Sidebar</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
+    <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/njkkgfngelkphhfadnpealmkjmdjcioc">
+    <style>
+      html, body {
+        height: 100%;
+        font-family: 'Lato', sans-serif;
+        font-weight: 300;
+      }
+      h1, h2 {
+        font-weight: 300;
+        font-family: 'Lato', sans-serif;
+      }
+      h1 {
+        font-size: 48px;
+        text-align: center;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .description {
+        font-size: 24px;
+        width: 1000px;
+        margin: 1em auto;
+      }
+      .btn {
+        width: 450px;
+        height: 70px;
+        line-height: 58px;
+        font-size: 24px;
+        border-radius: 1px;
+        border: none;
+        margin-top: 1em;
+      }
+      .btn-primary, .btn-primary:hover {
+        margin-top: 130px;
+        background-color: #FF0066;
+      }
+      .btn-secondary, .btn-secondary:hover {
+        color: white;
+        background-color: #E680B3;
+      }
+      .center {
+        text-align: center;
+      }
+      .preview {
+        position: absolute;
+        top: 83px;
+        left: 2px;
+        width: 596px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <h1>The Day's Sidebar</h1>
+      </div>
+      <div class="row">
+        <p class="description">Tired of looking at a cluttered new tab page? Want to keep up on the latest design news? Try The Day's Sidebar, now with 100% more animations! With "inspiration" from The Day's Color by Nigel Evan Dennis and links from Sidebar by Sacha Greif.</p>
+      </div>
+      <div class="row">
+        <div class="col-md-6 center">
+          <div class="row">
+            <a class="btn btn-primary" id="btn-install">
+              <i class="fa fa-paint-brush"></i>
+              Install to Beautify your New Tabs
+            </a>
+          </div>
+          <div class="row">
+            <a class="btn btn-secondary" href="https://github.com/kevinwuhoo/thedayssidebar">
+              <i class="fa fa-github-alt"></i>
+              View on Github
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row" style="position:relative;">
+            <img src="chrome-mockup.jpg">
+            <img class="preview" src="preview1.jpg">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('btn-install').onclick = function() {
+        chrome.webstore.install();
+      }
+    </script>
+  </body>
+</html>
