@@ -12,10 +12,10 @@ r.flushdb()
 hex_color_regex = re.compile(r'(#\w+)')
 get_hex_color = lambda s: hex_color_regex.search(s).group(1)
 
-soup = BeautifulSoup(open('2014-08-15.html'))
+soup = BeautifulSoup(open('2014-10-04.html'))
 
-swatches = []
-for swatch in soup.find_all('div', {'class': 'swatch_content'}):
+i = 0
+for i, swatch in enumerate(soup.find_all('div', {'class': 'swatch_content'})):
     month, day, year = [date.get_text() for date in swatch.find_all('date')]
 
     inspiration = swatch.find('div', {'class': 'swatch_info_right'}).find('span').get_text()
@@ -35,3 +35,5 @@ for swatch in soup.find_all('div', {'class': 'swatch_content'}):
     }
 
     r.set("%s-%s-%s" % (year, month, day), json.dumps(swatch))
+
+print "Found and stored %d swatches" % (i)
