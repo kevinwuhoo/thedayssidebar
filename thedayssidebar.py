@@ -1,5 +1,5 @@
 import os
-import urlparse
+from urllib.parse import urlparse
 import redis
 import json
 from flask import Flask, jsonify, g
@@ -18,16 +18,17 @@ if 'DYNO' in os.environ:
 else:
     is_development = True
 
+
 @app.route('/')
 def index():
     while True:
-        palette_key = g.db.randomkey()
+        palette_key = g.db.randomkey().decode('utf-8')
         if not 'sidebar' in palette_key:
             break
 
     return jsonify({
-        'palette': json.loads(g.db.get(palette_key)),
-        'sidebar': json.loads(g.db.get('sidebar'))
+        'palette': json.loads(g.db.get(palette_key).decode('utf-8')),
+        'sidebar': json.loads(g.db.get('sidebar').decode('utf-8'))
     })
 
 
@@ -101,7 +102,7 @@ def scrape_sidebar():
                     retry += 1
                 else:
                     r.delete(screenshot)
-                    print "failed on %s due to exception %s" % (item, e)
+                    print("failed on %s due to exception %s" % (item, e))
                     break
 
     return recent_5_items
@@ -128,14 +129,15 @@ def test_images():
 def before_request():
     g.db = connect_redis()
 
+
 def connect_redis():
-    url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+    url = urlparse(os.environ.get('REDISCLOUD_URL'))
     r = redis.StrictRedis(host=url.hostname, port=url.port, password=url.password)
     return r
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'scrape':
-        print scrape_sidebar()
+        print(scrape_sidebar())
     else:
         app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

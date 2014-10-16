@@ -3,9 +3,9 @@ import re
 import json
 import redis
 import os
-import urlparse
+from urllib.parse import urlparse
 
-url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+url = urlparse(os.environ.get('REDISCLOUD_URL'))
 r = redis.StrictRedis(host=url.hostname, port=url.port, password=url.password)
 r.flushdb()
 
@@ -36,4 +36,4 @@ for i, swatch in enumerate(soup.find_all('div', {'class': 'swatch_content'})):
 
     r.set("%s-%s-%s" % (year, month, day), json.dumps(swatch))
 
-print "Found and stored %d swatches" % (i)
+print("Found and stored %d swatches" % (i))
