@@ -7,9 +7,12 @@ from bs4 import BeautifulSoup
 import requests
 import arrow
 import sys
+import random
+import string
 from selenium import webdriver
-import base64
 from PIL import Image
+import cloudinary.uploader
+import cloudinary.api
 
 app = Flask(__name__)
 
@@ -22,13 +25,14 @@ else:
 @app.route('/')
 def index():
     while True:
-        palette_key = g.db.randomkey().decode('utf-8')
-        if not 'sidebar' in palette_key:
+        palette_key = g.db.randomkey()
+        if not ('sidebar' == palette_key or
+                'cloudinary_last_tag' == palette_key):
             break
 
     return jsonify({
-        'palette': json.loads(g.db.get(palette_key).decode('utf-8')),
-        'sidebar': json.loads(g.db.get('sidebar').decode('utf-8'))
+        'palette': json.loads(g.db.get(palette_key)),
+        'sidebar': json.loads(g.db.get('sidebar'))
     })
 
 
@@ -59,14 +63,12 @@ def scrape_sidebar():
         link = requests.get(item['link'], verify=False).url
         recent_5_items.append({
             'title': item['title'],
-            'link': link
+            'url': link
         })
-
-    r.delete('sidebar')
-    r.set('sidebar', json.dumps(recent_5_items))
 
     SCREEN_WIDTH = 1440
     SCREEN_HEIGHT = 450
+    CLOUDINARY_TAG = ''.join(random.choice(string.ascii_uppercase) for i in range(4))
     for i, item in enumerate(recent_5_items):
 
         screenshot = 'sidebar-img-%d.png' % (i)
@@ -82,7 +84,7 @@ def scrape_sidebar():
 
                 driver.set_page_load_timeout(30)
                 driver.set_window_size(1440, 450)
-                driver.get(item['link'])
+                driver.get(item['url'])
                 driver.save_screenshot(screenshot)
                 driver.quit()
 
@@ -91,9 +93,9 @@ def scrape_sidebar():
                 im = im.crop((0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
                 im.save(screenshot, optimize=True)
 
-                # encode as base64 and save to db
-                encoded_img = base64.b64encode(open(screenshot, 'rb').read())
-                r.set(screenshot.split('.')[0], encoded_img)
+                # upload image to cloudinary and add to list
+                image_upload = cloudinary.uploader.upload(screenshot, tags=CLOUDINARY_TAG)
+                recent_5_items[i]['image_url'] = image_upload['secure_url']
                 break
 
             except Exception as e:
@@ -105,21 +107,22 @@ def scrape_sidebar():
                     print("failed on %s due to exception %s" % (item, e))
                     break
 
+    if r.get('cloudinary_last_tag'):
+        cloudinary.api.delete_resources_by_tag(r.get('cloudinary_last_tag'))
+
+    r.set('sidebar', json.dumps(recent_5_items))
+    r.set('cloudinary_last_tag', CLOUDINARY_TAG)
+
     return recent_5_items
-
-
-@app.route('/sidebar/image/<img_num>')
-def sidebar_img(img_num):
-    return g.db.get('sidebar-img-%s' % (img_num))
 
 
 @app.route('/test/images')
 def test_images():
-    img = "<img src='data:image/png;base64,%s'>"
+    img = "<img src='%s'>"
     page = "<html><body>"
-    for i in range(5):
-        encoded_img = g.db.get('sidebar-img-%d' % (i))
-        page += img % (encoded_img)
+    for post in json.loads(g.db.get('sidebar')):
+        print(post)
+        page += img % (post['image_url'])
         page += "<br><hr><br>"
     page += "</body></html>"
     return page
@@ -132,7 +135,13 @@ def before_request():
 
 def connect_redis():
     url = urlparse(os.environ.get('REDISCLOUD_URL'))
-    r = redis.StrictRedis(host=url.hostname, port=url.port, password=url.password)
+    r = redis.StrictRedis(
+            host=url.hostname,
+            port=url.port,
+            password=url.password,
+            charset='utf-8',
+            decode_responses=True
+        )
     return r
 
 
