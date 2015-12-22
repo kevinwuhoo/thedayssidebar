@@ -95,7 +95,15 @@
 
     <script>
       document.getElementById('btn-install').onclick = function() {
-        chrome.webstore.install();
+        chrome.webstore.install(
+            '',
+            function() {
+              console.log('install success')
+            },
+            function(errorMessage) {
+              console.log(errorMessage)
+            }
+        );
       }
     </script>
   </body>
