@@ -50,6 +50,12 @@
         color: white;
         background-color: #E680B3;
       }
+      .btn-disabled, .btn-disabled:hover {
+        margin-top: 130px;
+        color: white;
+        background-color: #333;
+        cursor: not-allowed;
+      }
       .center {
         text-align: center;
       }
@@ -104,11 +110,27 @@
     </div>
 
     <script>
+      function installedButton(msg) {
+        document.getElementById('btn-install').className = 'btn btn-disabled';
+        document.getElementById('btn-install').innerHTML = '<i class="fa fa-thumbs-up"></i> ' + msg;
+      }
+
+      // TODO This only works for hosted apps. Need to inject dom element
+      // from the extension, but it's probably not worth those extra cpu cycles
+      // just to check if a new tab page is installed.
+      if (chrome.app.isInstalled) {
+        console.log('already installed')
+        installedButton('Already installed. Rock on!')
+      } else {
+        console.log('not installed')
+      }
+
       document.getElementById('btn-install').onclick = function() {
         chrome.webstore.install(
             '',
             function() {
-              console.log('install success')
+              console.log('installed')
+              installedButton('Thanks for installing!')
             },
             function(errorMessage) {
               console.log(errorMessage)
